@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 # 读取图片并缩放方便显示
-img = cv2.imread('../lab_test/15.jpg')
+img = cv2.imread('../data/15.jpg')
 height, width = img.shape[:2]
 size = (int(width * 0.2), int(height * 0.2))
 # 缩放
