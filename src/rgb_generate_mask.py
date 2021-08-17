@@ -9,7 +9,7 @@ import numpy as np
 
 # 样例图片
 img_name = "12.jpg"
-img = cv2.imread(f"../lab_test/{img_name}")
+img = cv2.imread(f"../data/{img_name}")
 img = cv2.resize(img, (1000, 800))
 # 颜色阈值 Upper
 upperb = None

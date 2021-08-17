@@ -5,8 +5,7 @@
 
 import cv2
 import numpy as np
-import sys
-
+import matplotlib.pyplot as plt
 # 更新MASK图像，并且刷新windows
 def updateMask():
     global img
@@ -67,18 +66,18 @@ def main(img):
     ## 红色阈值上界
     cv2.createTrackbar('maxH','image',0,255,updateThreshold)
     ## 设定红色阈值上界滑条的值为255
-    cv2.setTrackbarPos('maxH', 'image', 255)
-    cv2.setTrackbarPos('minH', 'image', 0)
+    cv2.setTrackbarPos('maxH', 'image', 28)
+    cv2.setTrackbarPos('minH', 'image', 1)
     # 绿色阈值 Bar
     cv2.createTrackbar('minS','image',0,255,updateThreshold)
     cv2.createTrackbar('maxS','image',0,255,updateThreshold)
-    cv2.setTrackbarPos('maxS', 'image', 255)
-    cv2.setTrackbarPos('minS', 'image', 0)
+    cv2.setTrackbarPos('maxS', 'image', 41)
+    cv2.setTrackbarPos('minS', 'image', 1)
     # 蓝色阈值 Bar
     cv2.createTrackbar('minV','image',0,255,updateThreshold)
     cv2.createTrackbar('maxV','image',0,255,updateThreshold)
     cv2.setTrackbarPos('maxV', 'image', 255)
-    cv2.setTrackbarPos('minV', 'image', 0)
+    cv2.setTrackbarPos('minV', 'image', 132)
 
     # 首次初始化窗口的色块
     # 后面的更新 都是由getTrackbarPos产生变化而触发
@@ -91,17 +90,29 @@ def main(img):
     cv2.destroyAllWindows()
     return mask
 
+def bi_blur(image):      #双边滤波
+    dst = cv2.bilateralFilter(image, 0, 100, 5)
+    cv2.imshow("bi_demo", dst)
+    cv2.waitKey(0)
+    return dst
+
+
 if __name__ == "__main__":
     # 样例图片 (从命令行中填入)
 
-    img = cv2.imread("tmp_bin.png")
-    # img = cv2.resize(img, (1000, 800))
+    num = "1.jpg"
+    # img = cv2.imread(f"../mask/{num}")
+    img = cv2.imread(f"../data/{num}")
 
-    # mask = main(img)
-    # cv2.imwrite(f'../mask/{img_name}', mask)
+    img = cv2.resize(img, (1000, 800))
+    w = img.shape[0]
+    h = img.shape[1]
+    channels = img.shape[2]
+    mask = main(img)
+    cv2.imwrite(f'../mask/{num}', mask)
     # from img_matting import *
     # waterShed(img)
-    img = cv2.bilateralFilter(img, 10, 200, 200) # 双边滤波
+    img = cv2.bilateralFilter(img, 10, 100, 100) # 双边滤波
 
     bgr = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
@@ -112,13 +123,11 @@ if __name__ == "__main__":
     _, contours, hierarchy = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     # 新打开一个图片，我这里这张图片是一张纯白图片
-    newImg = np.ones([800, 1000, 3], dtype=np.uint8) * 255
+    newImg = np.ones([w, h, 3], dtype=np.uint8) * 255
     # 画图
     cv2.drawContours(newImg, contours, -1, (0, 0, 0), -1, cv2.LINE_AA)
 
-    w = newImg.shape[0]
-    h = newImg.shape[1]
-    channels = newImg.shape[2]
+
 
     mask = np.zeros((w + 2, h + 2), np.uint8)
 
@@ -134,20 +143,29 @@ if __name__ == "__main__":
                     newImg[col][row][channel] = 0
     mask = newImg
                     # 展示
-    cv2.imshow("img", mask)
-    cv2.waitKey(0)
+    # cv2.imshow("img", mask)
+    # cv2.waitKey(0)
 
-    img_name = "12.jpg"
-    img = cv2.imread(f"../lab_test/{img_name}")
-    img = cv2.resize(img, (1000, 800))
+    img_name = "4.jpg"
+    img = cv2.imread(f"../data/{img_name}")
+    # img = cv2.resize(img, (w, h))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
 
     mask = cv2.GaussianBlur(mask, (3, 3), 0)
 
     img_fg = cv2.bitwise_and(gray, gray, mask=mask)
-    cv2.imshow("img", img_fg)
-    cv2.waitKey(0)
+
+    plt.figure(figsize=(12, 8))
+    plt.subplot(1, 2, 1)
+    plt.imshow(mask)
+    plt.subplot(1, 2, 2)
+    plt.imshow(img_fg)
+    plt.show()
+    #
+    # cv2.imshow("img", img_fg)
+    # cv2.waitKey(0)
+    cv2.imwrite(f'../output/{num}', img_fg)
 
 
 
