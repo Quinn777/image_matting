@@ -46,8 +46,16 @@
 
 ### 使用
 
+#### 安装依赖
+
+```
+pip3 install -r requirements.txt
+```
+
+#### 执行
+
 ```python
-python main.py
+python3 main.py
 ```
 
 
