@@ -3,6 +3,7 @@ from src.mask import *
 if __name__ == '__main__':
     img_dict = get_imgs("data")
     for img_name, first_img in img_dict.items():
+        print(f"Processing {img_name}...")
         # 去除阴影，生成掩膜
         second_img = process_shadow(first_img)
         # 消去白色噪点
